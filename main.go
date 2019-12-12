@@ -44,6 +44,9 @@ func main() {
 	router.POST("/user/login", handler.Login)
 	router.POST("/user/register", handler.Register)
 
+	//contact
+	router.POST("/user/addfriend", handler.AddFriend)
+
 	//提供静态资源目录支持
 	router.ServeFiles("/asset/*filepath", http.Dir("web/asset"))
 

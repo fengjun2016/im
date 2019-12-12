@@ -82,7 +82,6 @@ func Register(rw http.ResponseWriter, req *http.Request, params httprouter.Param
 		return
 	}
 	//否则插入新建数据
-	// user.Salt = fmt.Sprintf("%06d", rand.Int31n(10000))
 	pwdHash, err := auth.Encrypt(passwd)
 	if err != nil {
 		ResponseJson(rw, "", err)

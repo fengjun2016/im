@@ -6,5 +6,9 @@ import (
 )
 
 func CreateTable() {
-	app.DB.AutoMigrate(&model.User{})
+	app.DB.AutoMigrate(
+		&model.User{},
+		&model.Contact{},
+		&model.ContactGroups{},
+	)
 }

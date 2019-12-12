@@ -22,6 +22,11 @@ var (
 	RegisterParamsWrong     = &Errno{Code: 12002, Msg: "Register params wrong. Please confirm and retry again."}
 	RegisterRepeated        = &Errno{Code: 12003, Msg: "Register failed for repeat mobile. Please confirm and retry again."}
 	RegisterBindParamsError = &Errno{Code: 12004, Msg: "Register bind params failed."}
+
+	// contact
+	AddFriendsFailed             = &Errno{Code: 13001, Msg: "添加好友失败。"}
+	AddFriendsRepeatedInSameCate = &Errno{Code: 13002, Msg: "已经添加过该好友，请勿重复添加。"}
+	AddFriendsCanNotSelf         = &Errno{Code: 13003, Msg: "无法添加自己作为好友。"}
 )
 
 type Errno struct {
