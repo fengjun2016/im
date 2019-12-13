@@ -77,8 +77,24 @@ func (c *Contact) SearchFriend() ([]model.User, int, error) {
 	contacts := make([]model.Contact, 0)
 	objIds := make([]string, 0)
 	count := 0
+	coms := make([]User, 0)
 	if err := app.DB.Model(Contact{}).Where("owner_id = ? and cate = ?", c.OwnerId, GroupFriends).Find(&contacts).Error; err != nil {
 		logrus.Println("get my owner contact groups failed.", err.Error())
-		return contacts, count, err
+		return coms, count, err
 	}
+
+	for _, v := range contacts {
+		objIds = append(objIds, v.DstUserId)
+	}
+
+	if len(objIds) == 0 {
+		return coms
+	}
+
+	if err := app.DB.Model(User{}).Where("id in (?)", objIds).Count(&count).Find(&coms).Error; err != nil {
+		logrus.Println("get my contact friends user list failed.", err.Error())
+		return
+	}
+
+	return coms, count, nil
 }
