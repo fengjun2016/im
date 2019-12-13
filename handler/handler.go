@@ -16,6 +16,7 @@ var (
 	LoginFailed       = &Errno{Code: 11001, Msg: "Login failed. Please confirm and retry again."}
 	LoginParamsFailed = &Errno{Code: 11002, Msg: "Login params wrong. Please confirm and retry again."}
 	LoginNoUserExist  = &Errno{Code: 11003, Msg: "该手机号没有进行注册。"}
+	LoginMust         = &Errno{Code: 11004, Msg: "请先登录账户。"}
 
 	// register
 	RegisterFailed          = &Errno{Code: 12001, Msg: "Register failed. Please confirm and retry again."}
@@ -27,6 +28,14 @@ var (
 	AddFriendsFailed             = &Errno{Code: 13001, Msg: "添加好友失败。"}
 	AddFriendsRepeatedInSameCate = &Errno{Code: 13002, Msg: "已经添加过该好友，请勿重复添加。"}
 	AddFriendsCanNotSelf         = &Errno{Code: 13003, Msg: "无法添加自己作为好友。"}
+	GetCommunityUserIdsFailed    = &Errno{Code: 13004, Msg: "获取用户群友信息失败。"}
+	SearchMyFriendFailed         = &Errno{Code: 13005, Msg: "查找我的好友失败。"}
+
+	// contact groups
+	CreateContactGroupsFailed    = &Errno{Code: 14001, Msg: "创建群聊失败。"}
+	JoinContactGroupsFailed      = &Errno{Code: 14002, Msg: "加入群聊失败。"}
+	CreateContactGroupsNoSetName = &Errno{Code: 14003, Msg: "创建群聊没有设置名称。"}
+	CreateContatcGroupsTooMuch   = &Errno{Code: 14004, Msg: "一个用户最多只能创见5个群。"}
 )
 
 type Errno struct {

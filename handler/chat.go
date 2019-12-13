@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"net/http"
-
 	"github.com/julienschmidt/httprouter"
+	"gopkg.in/fatih/set.v0"
+	"net/http"
 )
 
 const (
@@ -70,7 +70,7 @@ var rwlocker sync.RWMutex
 func Chat(rw http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	//todo 检验接入是否合法
 	query := req.URL.Query()
-	id := query.Get("id")
+	userId := query.Get("id")
 	token := query.Get("token")
 
 	isvalid := checkToken(userId, token)
@@ -97,6 +97,18 @@ func Chat(rw http.ResponseWriter, req *http.Request, params httprouter.Params) {
 		Conn:      conn,
 		DataQueue: make(chan []byte, 50),
 		GroupSets: set.New(set.ThreadSafe),
+	}
+
+	//todo 获取用户全部群id
+	contact := Model.Contact{}
+	if _, commIds, _, err := contact.SearchCommunityIds(userId); err != nil {
+		logrus.Println("init get community userid s info failed.", err.Error())
+		ResponseJson(rw, "")
+		return
+	}
+	//刷新 group set
+	for _, v := range commIds {
+		node.GroupSets.Add(v)
 	}
 
 	//todo userid和node形成绑定关系
@@ -177,6 +189,11 @@ func dispatch(data []byte) {
 	//群聊
 	case CMD_ROOM_MSG:
 		//todo 群聊转发逻辑
+		for _, v := range clientMap {
+			if v.GroupSets.Has(msg.Dstid) {
+				v.DataQueue <- data
+			}
+		}
 	//心跳
 	case CMD_HEART:
 		//todo 一般啥都不干 只是为了保持tcp websocket的连接长时间不断开

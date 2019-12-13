@@ -1,6 +1,11 @@
 package model
 
-import "imWebSocket/app"
+import (
+	"imWebSocket/app"
+	"imWebSocket/model"
+
+	"github.com/sirupsen/logrus"
+)
 
 //好友和群都存在这个表里面
 //可根据具体业务做拆分
@@ -47,4 +52,33 @@ func (c *Contact) Create() error {
 
 func (c *Contact) CheckIsRepeatedAddFriends() error {
 	return app.DB.Model(c).Where("owner_id = ?", c.OwnerId).Where("dst_user_id = ?", c.DstUserId).Where("cate = ?", c.Cate).Find(c).Error
+}
+
+func (c *Contact) SearchCommunityIds(userId string) ([]Contact, []string, int, error) {
+	//todo 获取用户全部群id
+	contacts := make([]Contact, 0)
+	commIds := make([]string, 0)
+	count := 0
+
+	if err := app.DB.Model(c).Where("owner_id = ? and cate = ?", userId, GroupFriends).Count(&count).Find(&contacts).Error; err != nil {
+		logrus.Println("get community contacts failed.", err.Error())
+		return contacts, commIds, count, err
+	}
+
+	for _, c := range contacts {
+		commIds = append(commIds, c.DstUserId)
+	}
+
+	return contacts, commIds, count, nil
+}
+
+//查找好友
+func (c *Contact) SearchFriend() ([]model.User, int, error) {
+	contacts := make([]model.Contact, 0)
+	objIds := make([]string, 0)
+	count := 0
+	if err := app.DB.Model(Contact{}).Where("owner_id = ? and cate = ?", c.OwnerId, GroupFriends).Find(&contacts).Error; err != nil {
+		logrus.Println("get my owner contact groups failed.", err.Error())
+		return contacts, count, err
+	}
 }
