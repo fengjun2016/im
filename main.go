@@ -46,6 +46,8 @@ func main() {
 
 	//contact
 	router.POST("/user/addfriend", handler.AddFriend)
+	router.POST("/chat", handler.Chat)
+	router.POST("/attach/upload", handler.Upload)
 
 	//提供静态资源目录支持
 	router.ServeFiles("/asset/*filepath", http.Dir("web/asset"))

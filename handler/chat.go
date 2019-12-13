@@ -134,6 +134,7 @@ func recproc(node *Node) {
 			return
 		}
 		//todo 对data进一步处理
+		dispatch(data)
 		fmt.Printf("recv<=%s", data)
 	}
 }
@@ -158,4 +159,26 @@ func checkToken(userId, token string) bool {
 		return false
 	}
 	return user.Token == token
+}
+
+//消息分发 dispatch
+func dispatch(data []byte) {
+	//todo 解析data为message
+	msg := Message{}
+	if err := json.Unmarshal(data, &msg); err != nil {
+		logrus.Println("json unmarshal data to msg failed.", err.Error())
+		return
+	}
+	//todo 根据message的cmd属性做相应的处理
+	switch msg.cmd {
+	//单聊
+	case CMD_SINGLE_MSG:
+		sendMsg(msg.Dstid, data)
+	//群聊
+	case CMD_ROOM_MSG:
+		//todo 群聊转发逻辑
+	//心跳
+	case CMD_HEART:
+		//todo 一般啥都不干 只是为了保持tcp websocket的连接长时间不断开
+	}
 }
