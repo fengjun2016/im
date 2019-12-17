@@ -36,6 +36,7 @@ var (
 	JoinContactGroupsFailed      = &Errno{Code: 14002, Msg: "加入群聊失败。"}
 	CreateContactGroupsNoSetName = &Errno{Code: 14003, Msg: "创建群聊没有设置名称。"}
 	CreateContatcGroupsTooMuch   = &Errno{Code: 14004, Msg: "一个用户最多只能创见5个群。"}
+	SearchMyGroupsFailed         = &Errno{Code: 14005, Msg: "查找我的群列表失败。"}
 )
 
 type Errno struct {

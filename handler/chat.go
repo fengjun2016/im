@@ -147,6 +147,8 @@ func recproc(node *Node) {
 		}
 		//todo 对data进一步处理
 		dispatch(data)
+		//把消息广播到局域网
+		broadMsg(data)
 		fmt.Printf("recv<=%s", data)
 	}
 }
@@ -198,4 +200,72 @@ func dispatch(data []byte) {
 	case CMD_HEART:
 		//todo 一般啥都不干 只是为了保持tcp websocket的连接长时间不断开
 	}
+}
+
+//用来存放发送的要广播的数据
+var udpsendchan chan []byte = make(chan []byte, 1024)
+
+//使用基于udp协议的广播到不同服务器的节点上
+func broadMsg(data []byte) error {
+	udpsendchan <- data
+}
+
+//todo 完成udp数据的发送协程
+func udpsendproc() {
+	logrus.Println("start udpsendproc 开启udp发送数据的协程")
+	//todo 使用udp协议拨号连接
+	conn, err := net.DialUDP("udp", nil, &net.UDPAddr{
+		IP:   net.IPv4(192, 168, 0, 255),
+		Port: 3000,
+	})
+	defer conn.Close()
+	if err != nil {
+		logrus.Println(err.Error())
+		return
+	}
+	//todo 通过得到的conn连接发送消息
+	//for select 阻塞等待要发送的数据
+	for {
+		select {
+		case data := <-udpsendchan:
+			_, err = conn.Write(data)
+			if err != nil {
+				logrus.Println("stop idp send proc")
+				return
+			}
+		}
+	}
+}
+
+//项目开启运行udp发送和接收消息通知的协程运行
+func init() {
+	go udpsendproc()
+	go udprecvproc()
+}
+
+//todo 完成udp数据的接收协程
+func udprecvproc() {
+	logrus.Println("start udp recv proc goroutine")
+	//todo 监听udp广播端口
+	conn, err := net.ListenUdP("udp", &net.UDPAddr{
+		IP:   net.IPv4zero,
+		Port: 3000,
+	})
+	defer conn.Close()
+	if err != nil {
+		logrus.Println("stop udp recv proc goroutine")
+		return //退出本次协程的运行
+	}
+	//todo 处理端口发送过来的数据
+	for {
+		var buf [512]byte //存储从udp接收到的广播协议的数据
+		intn, err := conn.Read(buf[0:])
+		if err != nil {
+			logrus.Println(err.Error())
+			return
+		}
+		//直接调用之前的消息分发函数 进行消息分发处理
+		dispatch(buf[0:n])
+	}
+	logrus.Println("return udprecvproc")
 }

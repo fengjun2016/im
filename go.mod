@@ -3,6 +3,7 @@ module imWebSocket
 go 1.13
 
 require (
+	github.com/aliyun/aliyun-oss-go-sdk v2.0.4+incompatible // indirect
 	github.com/jinzhu/gorm v1.9.11
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/rs/xid v1.2.1

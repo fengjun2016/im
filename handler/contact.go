@@ -86,3 +86,51 @@ func JoinContactGroup(rw http.ResponseWriter, req *http.Request, params httprout
 	//添加好友成功
 	ResponseJson(rw, contact, nil)
 }
+
+func LoadFriend(rw http.ResponseWriter, req *http.Request) {
+	var loadFriendArgs ContactArg
+	//绑定请求参数
+	if err := request.Bind(req, &loadFriendArgs); err != nil {
+		logrus.Println("load friend bind args failed.", err.Error())
+		ResponseJson(rw, "", ErrBind)
+		return
+	}
+	contact := model.Contact{}
+	contact.UserId = loadFriendArgs.UserId
+	if users, usersNumber, err := contact.SearchFriend(); err != nil {
+		logrus.Println("serach my friend failed.", err.Error())
+		ResponseJson(rw, "", SearchMyFriendFailed)
+		return
+	}
+	response := map[string]interface{}{
+		"userList": users,
+		"count":    usersNumber,
+	}
+
+	ResponseJson(rw, response, nil)
+}
+
+func LoadCommunity(rw http.ResponseWriter, req *http.Request) {
+	var loadCommunityArgs ContactArgs
+	//绑定参数
+	if err := request.Bind(req, &loadCommunityArgs); err != nil {
+		logrus.Println("bind load community args failed.", err.Error())
+		ResponseJson(rw, "", ErrBind)
+		return
+	}
+
+	contact := model.Contact{}
+	contact.UserId = loadCommunityArgs.User
+	if communityies, count, err := contact.SearchCommunity(); err != nil {
+		logrus.Println("search community failed.", err.Error())
+		ResponseJson(rw, "", SearchMyGroupsFailed)
+		return
+	}
+
+	response := map[string]interface{}{
+		"List":  communityies,
+		"count": count,
+	}
+
+	ResponseJson(rw, response, nil)
+}

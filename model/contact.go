@@ -72,8 +72,8 @@ func (c *Contact) SearchCommunityIds(userId string) ([]Contact, []string, int, e
 	return contacts, commIds, count, nil
 }
 
-//查找好友
-func (c *Contact) SearchFriend() ([]model.User, int, error) {
+//查找群
+func (c *Contact) SearchCommunity() ([]model.User, int, error) {
 	contacts := make([]model.Contact, 0)
 	objIds := make([]string, 0)
 	count := 0
@@ -97,4 +97,31 @@ func (c *Contact) SearchFriend() ([]model.User, int, error) {
 	}
 
 	return coms, count, nil
+}
+
+//查找好友
+func (c *Contact) SearchFriend() ([]model.User, int, error) {
+	contacts := make([]model.Contact, 0)
+	friends := make([]model.User, 0)
+	objIds := make([]string, 0)
+	count := 0
+	if err := app.DB.Model(c).Where("owner_id = ? and cate = ?", c.UserId, SingleFriends).Find(&contacts).Error; err != nil {
+		logrus.Println("get my friend contatcs list failed error.", err.Error())
+		return friends, count, err
+	}
+
+	for _, v := range contacts {
+		objIds = append(objIds, v.DstUserId)
+	}
+
+	if len(objIds) == 0 {
+		logrus.Println("no friends exists")
+		return firends, count, nil
+	}
+
+	if err := app.DB.Model(model.User).Where("id in (?)", objIds).Find(&friends).Count(&count).Error; err != nil {
+		logrus.Println("select user form db failed", err.Error())
+		return friends, count, err
+	}
+	return friedns, count, nil
 }
