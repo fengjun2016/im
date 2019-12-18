@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"imWebSocket/model"
 	"imWebSocket/pkg/auth"
+	"imWebSocket/pkg/request"
 	"imWebSocket/pkg/util"
 	"net/http"
 	"time"
@@ -15,14 +16,25 @@ import (
 
 //用户登录
 func Login(rw http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	req.ParseForm()
-	mobile := req.PostForm.Get("mobile")
-	passwd := req.PostForm.Get("passwd")
-	logrus.Println("mobile", mobile)
-	logrus.Println("passwd", passwd)
+	//绑定参数
+	loginRequest := LoginRequest{}
+	if err := request.Bind(req, &loginRequest); err != nil {
+		logrus.Println("login request bind params failed.", ErrBind)
+		ResponseJson(rw, "", ErrBind)
+		return
+	}
+
+	mobile := loginRequest.Mobile
+	passwd := loginRequest.Passwd
+	if mobile == "" || passwd == "" {
+		logrus.Println("login request bind params failed.", LoginParamsFailed)
+		ResponseJson(rw, "", LoginParamsFailed)
+		return
+	}
 
 	user := model.User{}
 	user.Mobile = mobile
+	user.Passwd = passwd
 	//检测手机号是否存在
 	if user.Mobile == "" {
 		ResponseJson(rw, "", LoginParamsFailed)
@@ -62,11 +74,15 @@ func Login(rw http.ResponseWriter, req *http.Request, params httprouter.Params) 
 
 func Register(rw http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	//解析参数
-	req.ParseForm()
-	mobile := req.PostForm.Get("mobile")
-	passwd := req.PostForm.Get("passwd")
-	logrus.Println("mobile", mobile)
-	logrus.Println("passwd", passwd)
+	registerRequest := RegisterRequest{}
+	if err := request.Bind(req, &registerRequest); err != nil {
+		logrus.Println("register bind rquest params failed.", err.Error())
+		ResponseJson(rw, "", ErrBind)
+		return
+	}
+
+	mobile := registerRequest.Mobile
+	passwd := registerRequest.Passwd
 
 	user := model.User{}
 	user.Mobile = mobile

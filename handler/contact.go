@@ -87,7 +87,8 @@ func JoinContactGroup(rw http.ResponseWriter, req *http.Request, params httprout
 	ResponseJson(rw, contact, nil)
 }
 
-func LoadFriend(rw http.ResponseWriter, req *http.Request) {
+//加载群好友列表
+func LoadFriend(rw http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	var loadFriendArgs ContactArg
 	//绑定请求参数
 	if err := request.Bind(req, &loadFriendArgs); err != nil {
@@ -110,7 +111,7 @@ func LoadFriend(rw http.ResponseWriter, req *http.Request) {
 	ResponseJson(rw, response, nil)
 }
 
-func LoadCommunity(rw http.ResponseWriter, req *http.Request) {
+func LoadCommunity(rw http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	var loadCommunityArgs ContactArgs
 	//绑定参数
 	if err := request.Bind(req, &loadCommunityArgs); err != nil {
